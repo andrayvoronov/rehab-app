@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { initialPatients, xpLevelThresholds } from "./data";
 import { generatePlan } from "./planGenerator";
-import "./App.css";
+import "./app.css";
 
 // Journey stages mapped to levels
 const journeyStages = [
