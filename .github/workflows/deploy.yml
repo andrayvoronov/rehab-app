@@ -1,21 +1,21 @@
-name: Deploy Vite App
+name: Build and Deploy
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Node
+      - name: Use Node.js 22
         uses: actions/setup-node@v3
         with:
-          node-version: "18"
+          node-version: '22.x'
 
       - name: Install dependencies
         run: npm install
@@ -28,4 +28,3 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
-          force_orphan: true
