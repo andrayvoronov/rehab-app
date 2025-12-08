@@ -491,34 +491,47 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* XP / level (behaviour) */}
-                {selectedPatient.xp && (
-                  <div className="xp-wrapper">
-                    <div className="xp-header">
-                      <div className="label">Rehab level (behaviour)</div>
-                      <div className="xp-level">
-                        Level {selectedPatient.xp.level} ·{" "}
-                        {levelNames[selectedPatient.xp.level] || "In progress"}
-                      </div>
-                    </div>
-                    <div className="xp-bar">
-                      <div
-                        className="xp-bar-fill"
-                        style={{ width: `${xpProgressPercent}%` }}
-                      />
-                    </div>
-                    {selectedPatient.xp.nextLevelXP ? (
-                      <div className="xp-caption">
-                        {selectedPatient.xp.total} XP /{" "}
-                        {selectedPatient.xp.nextLevelXP} XP to next level
-                      </div>
-                    ) : (
-                      <div className="xp-caption">
-                        {selectedPatient.xp.total} XP · Max level reached
-                      </div>
-                    )}
-                  </div>
-                )}
+{/* XP / level (behaviour) */}
+{selectedPatient.xp && (
+  <section className="xp-section">
+    <h2>Rehab level (behaviour)</h2>
+
+    <p>
+      Level {selectedPatient.xp.level} ·{" "}
+      {levelNames[selectedPatient.xp.level] || "In progress"}
+    </p>
+
+    {selectedPatient.xp.nextLevelXP ? (
+      <p>
+        {selectedPatient.xp.total} XP /{" "}
+        {selectedPatient.xp.nextLevelXP} XP to next level
+      </p>
+    ) : (
+      <p>{selectedPatient.xp.total} XP · Max level reached</p>
+    )}
+
+    {/* XP progress bar */}
+    <div className="xp-bar">
+      <div
+        className="xp-bar__fill"
+        style={{ width: `${xpProgressPercent}%` }}
+      />
+    </div>
+
+    <p className="xp-meta">
+      Test mode only: use the button below to simulate XP gain.
+    </p>
+
+    <button
+      type="button"
+      className="button-secondary xp-test-button"
+      onClick={() => handleTestXP(selectedPatient.id, 25)}
+    >
+      +25 XP (test)
+    </button>
+  </section>
+)}
+
               </section>
 
               {/* Plan overview */}
