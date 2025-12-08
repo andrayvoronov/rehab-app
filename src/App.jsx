@@ -283,6 +283,44 @@ export default function App() {
       })
     );
   };
+  const handleTestXP = (patientId, amount = 25) => {
+    setPatients((prev) =>
+      prev.map((p) => {
+        if (p.id !== patientId) return p;
+
+        const currentXP = p.xp?.total ?? 0;
+        const newTotal = currentXP + amount;
+        const { level, nextLevelXP } = calculateLevelAndNext(newTotal);
+
+        const xpEntry = {
+          id: `xp-test-${Date.now()}`,
+          timestamp: new Date().toISOString(),
+          amount,
+          source: "test_button",
+        };
+
+        const updatedXP = {
+          total: newTotal,
+          level,
+          nextLevelXP,
+          history: [...(p.xp?.history || []), xpEntry],
+        };
+
+        const newLog = {
+          id: `log-xp-test-${Date.now()}`,
+          timestamp: new Date().toISOString(),
+          type: "system",
+          message: `Test XP applied (+${amount} XP). Behaviour level now ${level}.`,
+        };
+
+        return {
+          ...p,
+          xp: updatedXP,
+          logs: [newLog, ...(p.logs || [])],
+        };
+      })
+    );
+  };
 
   const activeStageId =
     selectedPatient?.clinicalStage || clinicalStages[0].id;
