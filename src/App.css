@@ -148,3 +148,218 @@ p {
 .button-secondary:hover {
   border-color: #9ca3af;
 }
+/* Pseudo login layout */
+.login-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: radial-gradient(circle at top, #0f172a 0, #020617 55%, #000 100%);
+  color: #e5e7eb;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(15, 23, 42, 0.96);
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.9);
+  padding: 24px 22px 20px;
+}
+
+.login-logo {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 8px;
+}
+
+.login-logo-pill {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(52, 211, 153, 0.6);
+  background: rgba(22, 163, 74, 0.12);
+  colour: #bbf7d0;
+}
+
+.login-title {
+  margin: 0 0 6px;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.login-subtitle {
+  margin: 0 0 18px;
+  font-size: 14px;
+  colour: #9ca3af;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.login-label {
+  font-size: 13px;
+  colour: #e5e7eb;
+}
+
+.login-label-optional {
+  font-size: 11px;
+  colour: #9ca3af;
+}
+
+.role-toggle {
+  display: flex;
+  gap: 8px;
+  padding: 4px;
+  background: rgba(15, 23, 42, 0.9);
+  border-radius: 999px;
+  border: 1px solid rgba(55, 65, 81, 0.9);
+}
+
+.role-pill {
+  flex: 1;
+  border: none;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  background: transparent;
+  colour: #9ca3af;
+  transition: background 0.12s ease, colour 0.12s ease, transform 0.06s ease;
+}
+
+.role-pill--active {
+  background: linear-gradient(135deg, #22c55e, #4ade80);
+  colour: #022c22;
+  transform: translateY(-1px);
+}
+
+.login-input {
+  border-radius: 10px;
+  border: 1px solid rgba(75, 85, 99, 0.9);
+  background: rgba(15, 23, 42, 0.9);
+  padding: 9px 11px;
+  font-size: 14px;
+  colour: #e5e7eb;
+  outline: none;
+}
+
+.login-input::placeholder {
+  colour: #6b7280;
+}
+
+.login-input:focus {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.5);
+}
+
+.login-button {
+  margin-top: 6px;
+  border-radius: 999px;
+  border: none;
+  padding: 10px 14px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(135deg, #22c55e, #4ade80);
+  colour: #022c22;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
+}
+
+.login-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
+
+.login-button:not(:disabled):hover {
+  filter: brightness(1.05);
+  box-shadow: 0 12px 35px rgba(34, 197, 94, 0.4);
+  transform: translateY(-1px);
+}
+
+.login-disclaimer {
+  margin-top: 8px;
+  font-size: 11px;
+  colour: #6b7280;
+  text-align: centre;
+}
+
+/* Simple shell styles for after login */
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #020617;
+  colour: #e5e7eb;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: centre;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(31, 41, 55, 0.9);
+  background: rgba(15, 23, 42, 0.96);
+}
+
+.app-brand-main {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.app-brand-tagline {
+  display: block;
+  font-size: 11px;
+  colour: #9ca3af;
+}
+
+.app-user {
+  display: flex;
+  gap: 10px;
+  align-items: centre;
+  font-size: 13px;
+}
+
+.app-user-role {
+  colour: #9ca3af;
+}
+
+.app-logout-button {
+  border-radius: 999px;
+  border: 1px solid rgba(55, 65, 81, 0.9);
+  background: rgba(15, 23, 42, 0.8);
+  padding: 5px 10px;
+  font-size: 12px;
+  colour: #e5e7eb;
+  cursor: pointer;
+}
+
+.app-main {
+  flex: 1;
+  padding: 18px;
+}
+
+.app-placeholder {
+  max-width: 520px;
+  margin: 0 auto;
+  text-align: centre;
+  border-radius: 18px;
+  border: 1px dashed rgba(75, 85, 99, 0.9);
+  padding: 24px;
+  background: radial-gradient(circle at top left, rgba(34, 197, 94, 0.18), rgba(15, 23, 42, 0.96));
+}

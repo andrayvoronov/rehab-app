@@ -195,7 +195,7 @@ body {
   gap: 6px;
   cursor: pointer;
   transition: border 120ms ease, background 120ms ease, transform 100ms ease;
-  text-align: centre;
+  text-align: center;
 }
 
 .patient-pill:hover {
@@ -415,7 +415,7 @@ body {
 .xp-test-btn {
   margin-top: 10px;
   width: 100%;
-  text-align: centre;
+  text-align: center;
 }
 
 /* Floating +25 XP */
@@ -516,15 +516,13 @@ body {
   }
 }
 
-/* Level-up popup using the image */
-
 /* Level-up popup using the pixel image */
 
 .levelup-popup {
   position: fixed;
   inset: 0;
   display: flex;
-  align-items: center;      /* <-- must be 'center', not 'centre' */
+  align-items: center;      /* must be 'center' */
   justify-content: center;
   pointer-events: none;
   z-index: 40;
@@ -565,6 +563,7 @@ body {
     opacity: 0;
   }
 }
+
 /* Screen shake effect */
 @keyframes screenShake {
   0% { transform: translate(0, 0); }
@@ -578,6 +577,7 @@ body {
 .screen-shake {
   animation: screenShake 0.35s ease-in-out;
 }
+
 /* Confetti container sits over the whole screen */
 .confetti {
   position: fixed;
@@ -625,8 +625,6 @@ body {
       scale(0.9) rotate(270deg);
   }
 }
-
-
 
 /* Mode toggle */
 
@@ -731,7 +729,7 @@ body {
 
 .character-preview {
   display: flex;
-  align-items: centre;
+  align-items: center;
   gap: 14px;
   margin: 10px 0 16px;
 }
@@ -746,8 +744,8 @@ body {
   border-radius: 999px;
   border: 2px solid var(--accent-strong);
   display: flex;
-  align-items: centre;
-  justify-content: centre;
+  align-items: center;
+  justify-content: center;
   background: radial-gradient(circle, #052e16, #020617 70%);
   box-shadow: 0 0 18px rgba(34, 197, 94, 0.6);
 }
@@ -792,7 +790,7 @@ body {
 
 .wizard-wrapper {
   display: flex;
-  justify-content: center;   /* must be 'center', not 'centre' */
+  justify-content: center;
   align-items: center;
   margin: 1.5rem 0;
 }
@@ -842,6 +840,7 @@ body {
     height: 6px;
   }
 }
+
 .app-header {
   display: flex;
   align-items: center;
@@ -855,8 +854,8 @@ body {
   justify-content: center;
   align-items: center;
 
-  transform: translateX(160px); /* move LEFT, use +20px to move RIGHT */
-} 
+  transform: translateX(-100px); /* move LEFT, use +20px to move RIGHT */
+}
 
 .app-banner {
   display: block;
@@ -872,3 +871,225 @@ body {
   margin-left: auto;
 }
 
+/* ------------------------------------------------------------------
+   LOGIN + HEADER USER STYLES
+   ------------------------------------------------------------------ */
+
+/* Root wrapper when only the login is shown */
+.app-root-login {
+  position: fixed;      /* full screen, ignores other layout */
+  inset: 0;             /* top:0; right:0; bottom:0; left:0 */
+  display: flex;
+  align-items: center;  /* vertical centre */
+  justify-content: center; /* horizontal centre */
+  padding: 0;
+}
+/* Login card layout, matching card aesthetic */
+
+.login-wrapper {
+  width: 100%;
+  max-width: 460px;
+}
+
+.login-card {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.9);
+  padding: 22px 20px 18px;
+  color: var(--text-main);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Header / logo */
+
+.login-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.login-logo-pill {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(34, 197, 94, 0.5);
+  background: rgba(22, 163, 74, 0.12);
+  color: #bbf7d0;
+}
+
+.login-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.login-subtitle {
+  margin: 4px 0 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+/* Form */
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.login-label {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.login-label-optional {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Role toggle */
+
+.role-toggle {
+  display: flex;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid rgba(55, 65, 81, 0.9);
+  background: rgba(15, 23, 42, 0.9);
+}
+
+.role-pill {
+  flex: 1;
+  border: none;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-muted);
+  transition:
+    background 0.12s ease,
+    color 0.12s ease,
+    transform 0.06s ease;
+}
+
+.role-pill--active {
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: #022c22;
+  transform: translateY(-1px);
+}
+
+/* Inputs */
+
+.login-input {
+  border-radius: 10px;
+  border: 1px solid rgba(75, 85, 99, 0.9);
+  background: rgba(15, 23, 42, 0.9);
+  padding: 9px 11px;
+  font-size: 14px;
+  color: var(--text-main);
+  outline: none;
+}
+
+.login-input::placeholder {
+  color: #6b7280;
+}
+
+.login-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.4);
+}
+
+/* Login button */
+
+.login-button {
+  width: 100%;
+  margin-top: 4px;
+  border-radius: 999px;
+  border: none;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: #022c22;
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.08s ease,
+    filter 0.08s ease;
+}
+
+.login-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
+
+.login-button:not(:disabled):hover {
+  filter: brightness(1.05);
+  box-shadow: 0 12px 35px rgba(34, 197, 94, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Helper text */
+
+.login-disclaimer {
+  margin: 6px 2px 0;
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Header user block (top-right) */
+
+.header-user-block {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-user {
+  font-size: 13px;
+  color: var(--text-main);
+}
+
+.header-user-role {
+  color: var(--text-muted);
+}
+
+/* Logout / Switch user button */
+
+.app-logout-button {
+  border-radius: 999px;
+  border: 1px solid rgba(55, 65, 81, 0.9);
+  background: rgba(15, 23, 42, 0.85);
+  padding: 6px 10px;
+  font-size: 12px;
+  color: var(--text-main);
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease;
+}
+
+.app-logout-button:hover {
+  background: rgba(15, 23, 42, 1);
+  border-color: var(--accent);
+}

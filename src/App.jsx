@@ -13,6 +13,114 @@ function getXpForLevel(level) {
   return base + perLevel * level;
 }
 
+// --- PSEUDO LOGIN COMPONENT ---
+
+const ROLES = [
+  { id: "practitioner", label: "Clinician" },
+  { id: "patient", label: "Patient" },
+];
+
+function PseudoLogin({ onLogin }) {
+  const [role, setRole] = useState("practitioner");
+  const [name, setName] = useState("");
+  const [code, setCode] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!name.trim()) return;
+
+    const profile = {
+      role,
+      name: name.trim(),
+      code: code.trim(),
+      createdAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem("rehabAppUser", JSON.stringify(profile));
+    onLogin(profile);
+  };
+
+  return (
+    <div className="login-wrapper">
+      <div className="login-card">
+        <div className="login-logo">
+          <span className="login-logo-pill">RxHabQuest</span>
+        </div>
+
+        <h1 className="login-title">Adventure awaits!</h1>
+        <p className="login-subtitle">
+          Choose how you&apos;re playing today, name your character, and we&apos;ll
+          load your view.
+        </p>
+
+        <form className="login-form" onSubmit={handleSubmit}>
+          {/* Role toggle */}
+          <div className="login-field">
+            <label className="login-label">I&apos;m logging in as</label>
+            <div className="role-toggle">
+              {ROLES.map((r) => (
+                <button
+                  key={r.id}
+                  type="button"
+                  className={
+                    "role-pill" + (role === r.id ? " role-pill--active" : "")
+                  }
+                  onClick={() => setRole(r.id)}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Name */}
+          <div className="login-field">
+            <label className="login-label">Display name</label>
+            <input
+              className="login-input"
+              placeholder={
+                role === "practitioner"
+                  ? "e.g. Dr Andray"
+                  : "e.g. RehabRanger27"
+              }
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+
+          {/* Optional clinic / code */}
+          <div className="login-field">
+            <label className="login-label">
+              Clinic / invite code{" "}
+              <span className="login-label-optional">(optional)</span>
+            </label>
+            <input
+              className="login-input"
+              placeholder="e.g. GRAVITY-OSTEO"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+            />
+          </div>
+
+          <button
+            className="login-button"
+            type="submit"
+            disabled={!name.trim()}
+          >
+            Enter RxHabQuest
+          </button>
+
+          <p className="login-disclaimer">
+            Pseudo login only • No real authentication • Stored in your browser
+          </p>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// --- EXISTING DATA + COMPONENTS ---
+
 const initialPatients = [
   {
     id: "p-1",
@@ -33,10 +141,10 @@ const initialPatients = [
     quests: [
       "Complete your prescribed foundation-level exercises 3x this week.",
       "Log pain levels before and after one key activity (stairs, running, or box jumps).",
-      "Do one ‘win’ activity that feels good (e.g. cycling, walking) and record how it felt."
+      "Do one ‘win’ activity that feels good (e.g. cycling, walking) and record how it felt.",
     ],
     xpLevel: 2,
-    xpCurrent: 40
+    xpCurrent: 40,
   },
   {
     id: "p-2",
@@ -56,10 +164,10 @@ const initialPatients = [
     quests: [
       "Complete strength block (squats, hinges, calf raises) 2–3x this week.",
       "Track RPE and knee response for one run.",
-      "Add one graded exposure set (tempo, volume, or incline) if symptoms allow."
+      "Add one graded exposure set (tempo, volume, or incline) if symptoms allow.",
     ],
     xpLevel: 3,
-    xpCurrent: 30
+    xpCurrent: 30,
   },
   {
     id: "p-3",
@@ -80,11 +188,11 @@ const initialPatients = [
     quests: [
       "Complete shoulder control drills before every training session.",
       "Perform overhead strength block 2x this week and record loads.",
-      "Add one graded exposure set to snatch or jerk from blocks."
+      "Add one graded exposure set to snatch or jerk from blocks.",
     ],
     xpLevel: 4,
-    xpCurrent: 40
-  }
+    xpCurrent: 40,
+  },
 ];
 
 function Typewriter({ text, speed = 25 }) {
@@ -106,88 +214,12 @@ function Typewriter({ text, speed = 25 }) {
   return <p>{displayed}</p>;
 }
 
+// Tweaked to start from welcome, now that pseudo login handles the email bit
 function PatientFlow() {
-  const [step, setStep] = useState("login");
-  const [email, setEmail] = useState("patient@example.com");
-  const [password, setPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
+  const [step, setStep] = useState("welcome");
   const [avatarArchetype, setAvatarArchetype] = useState("Runner");
   const [avatarVibe, setAvatarVibe] = useState("Calm & steady");
   const [avatarFocus, setAvatarFocus] = useState("Lower limb");
-
-  if (step === "login") {
-    return (
-      <main className="patient-main">
-        <section className="card">
-          <div className="card-header">
-            <h2>Patient login (demo)</h2>
-          </div>
-          <p className="card-helper">
-            In the real app, you&apos;d arrive here from an email invite with your
-            temporary password.
-          </p>
-          <div className="form-grid">
-            <label className="form-field">
-              <span className="label">Email</span>
-              <input
-                className="input"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </label>
-            <label className="form-field">
-              <span className="label">Temporary password</span>
-              <input
-                className="input"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </label>
-          </div>
-          <button
-            className="btn-primary full-width-btn"
-            onClick={() => setStep("setPassword")}
-          >
-            Log in (test)
-          </button>
-        </section>
-      </main>
-    );
-  }
-
-  if (step === "setPassword") {
-    return (
-      <main className="patient-main">
-        <section className="card">
-          <div className="card-header">
-            <h2>Set your password</h2>
-          </div>
-          <p className="card-helper">
-            For now this is just a front-end flow to visualise how onboarding will feel.
-          </p>
-          <div className="form-grid">
-            <label className="form-field">
-              <span className="label">New password</span>
-              <input
-                className="input"
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-              />
-            </label>
-          </div>
-          <button
-            className="btn-primary full-width-btn"
-            onClick={() => setStep("welcome")}
-          >
-            Save password
-          </button>
-        </section>
-      </main>
-    );
-  }
 
   if (step === "welcome") {
     return (
@@ -198,7 +230,8 @@ function PatientFlow() {
           </div>
 
           <p className="card-helper">
-            This is where the light RPG flavour comes in and sets the tone.
+            This is where the light RPG flavour sets the tone for your
+            programme.
           </p>
 
           <div className="wizard-wrapper">
@@ -238,8 +271,8 @@ Ready to step into your story and build the most capable version of you?`}
             <h2>Create your rehab character</h2>
           </div>
           <p className="card-helper">
-            None of this changes your clinical programme – it just gives your journey a
-            face and a feel that matches you.
+            None of this changes your clinical programme – it just gives your
+            journey a face and a feel that matches you.
           </p>
 
           <div className="form-grid">
@@ -298,8 +331,8 @@ Ready to step into your story and build the most capable version of you?`}
               </p>
               <p className="character-sub">Focus: {avatarFocus}</p>
               <p className="hint-text">
-                Later this can sync with a visual avatar, gear, and cosmetic unlocks as
-                they progress.
+                Later this can sync with a visual avatar, gear, and cosmetic
+                unlocks as you progress.
               </p>
             </div>
           </div>
@@ -323,8 +356,8 @@ Ready to step into your story and build the most capable version of you?`}
           <h2>Patient portal (preview)</h2>
         </div>
         <p className="card-helper">
-          This is a simple mock of what a real patient view could look like once their
-          character is created.
+          This is a simple mock of what a real patient view could look like
+          once their character is created.
         </p>
 
         <div className="character-preview portal-preview">
@@ -346,7 +379,7 @@ Ready to step into your story and build the most capable version of you?`}
         <div className="portal-grid">
           <div>
             <p className="label">Today&apos;s main quest</p>
-            <p>Complete your foundation block and log how your body feels after.</p>
+            <p>Complete your foundation block and log how your body feels.</p>
           </div>
           <div>
             <p className="label">This week</p>
@@ -357,7 +390,7 @@ Ready to step into your story and build the most capable version of you?`}
               </li>
               <li className="quest-item">
                 <span className="quest-checkbox" />
-                <span>1 × &quot;win&quot; activity that feels good in your body</span>
+                <span>1 × &quot;win&quot; activity that feels good</span>
               </li>
               <li className="quest-item">
                 <span className="quest-checkbox" />
@@ -376,7 +409,10 @@ Ready to step into your story and build the most capable version of you?`}
   );
 }
 
+// --- MAIN APP ---
+
 function App() {
+  const [user, setUser] = useState(null);
   const [mode, setMode] = useState("practitioner");
   const [patientData, setPatientData] = useState(initialPatients);
   const [selectedId, setSelectedId] = useState(initialPatients[0].id);
@@ -386,6 +422,30 @@ function App() {
   const [levelUpKey, setLevelUpKey] = useState(0);
   const [showLevelUpPopup, setShowLevelUpPopup] = useState(false);
 
+  // Hydrate pseudo user
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("rehabAppUser");
+      if (raw) {
+        const stored = JSON.parse(raw);
+        setUser(stored);
+        setMode(stored.role === "patient" ? "patient" : "practitioner");
+      }
+    } catch (err) {
+      console.error("Failed to load stored user", err);
+    }
+  }, []);
+
+  const handleLogin = (profile) => {
+    setUser(profile);
+    setMode(profile.role === "patient" ? "patient" : "practitioner");
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("rehabAppUser");
+    setUser(null);
+  };
+
   const selectedIndex = patientData.findIndex((p) => p.id === selectedId);
   const selected = selectedIndex >= 0 ? patientData[selectedIndex] : null;
 
@@ -394,8 +454,8 @@ function App() {
       ? Math.min(
           100,
           Math.round(
-            (selected.xpCurrent / getXpForLevel(selected.xpLevel)) * 100
-          )
+            (selected.xpCurrent / getXpForLevel(selected.xpLevel)) * 100,
+          ),
         )
       : 100;
 
@@ -445,39 +505,61 @@ function App() {
     });
   };
 
+// If no pseudo user yet → show login screen
+if (!user) {
+  return (
+    <div className="app-root-login">
+      <PseudoLogin onLogin={handleLogin} />
+    </div>
+  );
+}
+
   return (
     <div className={"app-root" + (showLevelUpPopup ? " screen-shake" : "")}>
       <header className="app-header">
-  <div className="banner-wrapper">
-    <img
-      src={rxhabBanner}
-      alt="RxHabQuest Banner"
-      className="app-banner"
-    />
-  </div>
+        <div className="banner-wrapper">
+          <img
+            src={rxhabBanner}
+            alt="RxHabQuest Banner"
+            className="app-banner"
+          />
+        </div>
 
-  <div className="header-meta">
-    <div className="mode-toggle">
-      <button
-        className={
-          "mode-btn" + (mode === "practitioner" ? " mode-btn-active" : "")
-        }
-        onClick={() => setMode("practitioner")}
-      >
-        Practitioner view
-      </button>
-      <button
-        className={
-          "mode-btn" + (mode === "patient" ? " mode-btn-active" : "")
-        }
-        onClick={() => setMode("patient")}
-      >
-        Patient journey (demo)
-      </button>
-    </div>
-    <span className="env-pill">Prototype build</span>
-  </div>
-</header>
+        <div className="header-meta">
+          <div className="mode-toggle">
+            <button
+              className={
+                "mode-btn" +
+                (mode === "practitioner" ? " mode-btn-active" : "")
+              }
+              onClick={() => setMode("practitioner")}
+            >
+              Practitioner view
+            </button>
+            <button
+              className={
+                "mode-btn" + (mode === "patient" ? " mode-btn-active" : "")
+              }
+              onClick={() => setMode("patient")}
+            >
+              Patient journey (demo)
+            </button>
+          </div>
+
+          <div className="header-user-block">
+            <span className="env-pill">Prototype build</span>
+            <span className="header-user">
+              {user.name}{" "}
+              <span className="header-user-role">
+                ({user.role === "patient" ? "Patient" : "Clinician"})
+              </span>
+            </span>
+            <button className="app-logout-button" onClick={handleLogout}>
+              Switch user
+            </button>
+          </div>
+        </div>
+      </header>
 
       {/* LEVEL UP overlay using your pixel image */}
       {showLevelUpPopup && (
@@ -501,7 +583,7 @@ function App() {
               "#f87171",
               "#34d399",
               "#60a5fa",
-              "#fb923c"
+              "#fb923c",
             ];
 
             return (
@@ -511,7 +593,7 @@ function App() {
                 style={{
                   "--x": x,
                   "--y": y,
-                  "--c": colours[i % colours.length]
+                  "--c": colours[i % colours.length],
                 }}
               />
             );
@@ -626,7 +708,7 @@ function App() {
                   {selected.xpLevel >= XP_LEVEL_CAP
                     ? "MAX LEVEL"
                     : `${selected.xpCurrent} / ${getXpForLevel(
-                        selected.xpLevel
+                        selected.xpLevel,
                       )} XP`}
                 </span>
               </div>
@@ -669,7 +751,9 @@ function App() {
 
             <div className="behaviour-level">
               <p className="behaviour-title">{selected.behaviourLevel}</p>
-              <p className="behaviour-summary">{selected.behaviourSummary}</p>
+              <p className="behaviour-summary">
+                {selected.behaviourSummary}
+              </p>
             </div>
 
             <div className="divider" />
