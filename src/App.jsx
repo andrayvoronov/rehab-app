@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import "./index.css";
 import wizardImg from "./assets/FF_wizard.png";
 import levelUpImg from "./assets/level-up.png";
-
+import rxhabBanner from "./assets/rxhabquest_banner.png";
 
 const XP_LEVEL_CAP = 99;
 
@@ -448,35 +448,36 @@ function App() {
   return (
     <div className={"app-root" + (showLevelUpPopup ? " screen-shake" : "")}>
       <header className="app-header">
-        <div>
-          <h1>Rehab Practitioner Dashboard</h1>
-          <p className="app-subtitle">
-            Front-end only · <span className="badge badge-pill">Test mode ON</span>
-          </p>
-        </div>
+  <div className="banner-wrapper">
+    <img
+      src={rxhabBanner}
+      alt="RxHabQuest Banner"
+      className="app-banner"
+    />
+  </div>
 
-        <div className="header-meta">
-          <div className="mode-toggle">
-            <button
-              className={
-                "mode-btn" + (mode === "practitioner" ? " mode-btn-active" : "")
-              }
-              onClick={() => setMode("practitioner")}
-            >
-              Practitioner view
-            </button>
-            <button
-              className={
-                "mode-btn" + (mode === "patient" ? " mode-btn-active" : "")
-              }
-              onClick={() => setMode("patient")}
-            >
-              Patient journey (demo)
-            </button>
-          </div>
-          <span className="env-pill">Prototype build</span>
-        </div>
-      </header>
+  <div className="header-meta">
+    <div className="mode-toggle">
+      <button
+        className={
+          "mode-btn" + (mode === "practitioner" ? " mode-btn-active" : "")
+        }
+        onClick={() => setMode("practitioner")}
+      >
+        Practitioner view
+      </button>
+      <button
+        className={
+          "mode-btn" + (mode === "patient" ? " mode-btn-active" : "")
+        }
+        onClick={() => setMode("patient")}
+      >
+        Patient journey (demo)
+      </button>
+    </div>
+    <span className="env-pill">Prototype build</span>
+  </div>
+</header>
 
       {/* LEVEL UP overlay using your pixel image */}
       {showLevelUpPopup && (
