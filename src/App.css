@@ -1,10 +1,14 @@
-/* ---------- Global layout (simple, dark dashboard) ---------- */
+/* ---------------------------------------------------- */
+/*                 BALDUR'S GATE 3 THEME                */
+/* ---------------------------------------------------- */
+
+/* GLOBAL ------------------------------------------------ */
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #020617; /* near-black */
-  color: #e5e7eb;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #0b0f14 url('/assets/ui/bg_vignette.png') center/cover no-repeat fixed;
+  color: #e6dccc; /* warm parchment text */
 }
 
 #root {
@@ -13,20 +17,103 @@ body {
   box-sizing: border-box;
 }
 
-/* Optional basic text styles */
+/* BG3 heading font (optional) */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap');
 
-h1,
-h2,
-h3 {
+h1, h2, h3 {
   margin: 0 0 0.5rem;
   font-weight: 600;
+  font-family: "Cinzel", serif;
+  letter-spacing: 0.4px;
+  color: #f3e8d0;
+  text-shadow: 0 0 6px rgba(255, 230, 180, 0.25);
 }
 
 p {
   margin: 0.25rem 0;
+  color: #d8d2c4;
+  font-size: 0.95rem;
 }
 
-/* ---------- Clinical stage journey tiles ---------- */
+/* ---------------------------------------------------- */
+/*                     CARD / PANELS                    */
+/* ---------------------------------------------------- */
+
+.card {
+  background: rgba(22, 18, 12, 0.55);
+  border: 1px solid rgba(255, 210, 150, 0.35);
+  border-radius: 14px;
+  padding: 1.25rem;
+  backdrop-filter: blur(6px);
+  box-shadow:
+    inset 0 0 35px rgba(255, 220, 170, 0.06),
+    0 0 22px rgba(0,0,0,0.55),
+    0 0 12px rgba(255, 210, 150, 0.08);
+}
+
+/* Section dividers */
+.divider {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    rgba(255, 210, 150, 0),
+    rgba(255, 210, 150, 0.35),
+    rgba(255, 210, 150, 0)
+  );
+  margin: 1rem 0;
+}
+
+/* Card header underline effect */
+.card-header {
+  border-bottom: 1px solid rgba(255, 230, 190, 0.2);
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* ---------------------------------------------------- */
+/*                BUTTONS — FANTASY STYLE               */
+/* ---------------------------------------------------- */
+
+.btn-primary,
+.primary-button {
+  background: linear-gradient(180deg, #e8c07a, #b88e46);
+  color: #1a1206;
+  border: 1px solid #f0d49a;
+  border-radius: 10px;
+  padding: 0.55rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow:
+    inset 0 0 10px rgba(255, 240, 200, 0.4),
+    0 0 10px rgba(255, 210, 150, 0.2);
+  transition: all 0.2s;
+}
+
+.btn-primary:hover,
+.primary-button:hover {
+  background: linear-gradient(180deg, #f3dba6, #c9a35a);
+  transform: translateY(-1px);
+  box-shadow: 0 0 14px rgba(255, 220, 160, 0.5);
+}
+
+/* Secondary (outline) */
+.button-secondary {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255, 220, 160, 0.35);
+  color: #e8d9c4;
+  padding: 0.45rem 0.9rem;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.button-secondary:hover {
+  border-color: rgba(255, 230, 180, 0.75);
+  color: #fff2dc;
+}
+
+/* ---------------------------------------------------- */
+/*              JOURNEY TILES (Clinical Stages)         */
+/* ---------------------------------------------------- */
 
 .journey-stage-row {
   display: flex;
@@ -38,10 +125,14 @@ p {
 .journey-stage {
   width: 90px;
   height: 90px;
-  border-radius: 1.5rem; /* “round square” */
-  border: 2px solid #4b5563;
-  background: #020617;
-  color: #e5e7eb;
+  border-radius: 1rem;
+  border: 2px solid rgba(255, 220, 160, 0.25);
+  background: radial-gradient(
+    circle at top,
+    rgba(255, 220, 160, 0.12),
+    rgba(20, 16, 12, 0.65)
+  );
+  color: #f4e8d4;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -50,101 +141,119 @@ p {
   padding: 0.5rem;
   box-sizing: border-box;
   transition: all 0.25s ease;
-  box-shadow: 0 0 0 rgba(34, 197, 94, 0);
-  cursor: default;
+  box-shadow: 0 0 0 rgba(255, 220, 160, 0);
 }
 
 .journey-stage--past {
-  border-color: #6b7280;
-  background: radial-gradient(circle at top, #111827, #020617);
-  opacity: 0.9;
+  opacity: 0.85;
+  border-color: rgba(255, 230, 190, 0.25);
 }
 
 .journey-stage--active {
-  border-color: #22c55e;
-  background: radial-gradient(circle at top, #22c55e33, #020617);
-  box-shadow: 0 0 18px rgba(34, 197, 94, 0.75);
+  border-color: rgba(255, 220, 160, 0.6);
+  box-shadow: 0 0 22px rgba(255, 210, 140, 0.75);
   transform: translateY(-4px) scale(1.03);
-  animation: pulse-glow 1.8s ease-in-out infinite;
+  animation: pulseActive 2s ease-in-out infinite;
+}
+
+@keyframes pulseActive {
+  0% { box-shadow: 0 0 0 rgba(255, 210, 140, 0.3); }
+  50% { box-shadow: 0 0 30px rgba(255, 210, 140, 0.85); }
+  100% { box-shadow: 0 0 0 rgba(255, 210, 140, 0.3); }
 }
 
 .journey-stage:hover {
   transform: translateY(-2px) scale(1.02);
-  border-color: #22c55e;
+  border-color: rgba(255, 230, 190, 0.7);
 }
 
-@keyframes pulse-glow {
-  0% {
-    box-shadow: 0 0 0 rgba(34, 197, 94, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 22px rgba(34, 197, 94, 0.9);
-  }
-  100% {
-    box-shadow: 0 0 0 rgba(34, 197, 94, 0.4);
-  }
-}
-
-/* ---------- XP bar + test button ---------- */
-
-.xp-section {
-  margin-top: 1.5rem;
-}
+/* ---------------------------------------------------- */
+/*              XP BAR — GOLD FANTASY GLOW              */
+/* ---------------------------------------------------- */
 
 .xp-bar {
   position: relative;
   width: 100%;
-  height: 10px;
+  height: 12px;
   border-radius: 999px;
-  background: #111827;
+  background: rgba(30, 25, 20, 0.9);
   overflow: hidden;
-  margin-top: 0.5rem;
+  border: 1px solid rgba(255, 220, 160, 0.4);
 }
 
+.xp-bar-fill,
 .xp-bar__fill {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #22c55e, #a3e635);
-  transition: width 0.25s ease;
+  background: linear-gradient(90deg, #e8c27a, #ffefbf);
+  box-shadow: 0 0 14px rgba(255, 220, 160, 0.65);
+  transition: width 0.3s ease;
 }
 
-.xp-meta {
+.xp-meta,
+.xp-hint {
+  color: #cfc7b7;
   font-size: 0.85rem;
-  color: #9ca3af;
-  margin-top: 0.25rem;
 }
 
-/* Re-use the existing button style but give test XP a bit of spacing */
+/* ---------------------------------------------------- */
+/*              PATIENT LIST (left column)              */
+/* ---------------------------------------------------- */
 
-.xp-test-button {
-  margin-top: 0.75rem;
-}
-
-/* ---------- Modal / buttons (re-use your existing classes) ---------- */
-
-.primary-button {
-  background: #22c55e;
-  color: #020617;
-  border: none;
-  border-radius: 999px;
-  padding: 0.5rem 1rem;
-  font-weight: 600;
+.patient-pill {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 220, 160, 0.25);
+  border-radius: 10px;
+  padding: 0.65rem 0.8rem;
+  color: #e8dcc4;
+  width: 100%;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
   cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 0.4rem;
 }
 
-.primary-button:hover {
-  background: #16a34a;
+.patient-pill:hover {
+  border-color: rgba(255, 230, 180, 0.6);
+  background: rgba(255, 230, 180, 0.07);
 }
 
-.button-secondary {
-  background: transparent;
-  color: #e5e7eb;
-  border: 1px solid #4b5563;
-  border-radius: 999px;
-  padding: 0.45rem 0.9rem;
-  cursor: pointer;
+.patient-pill-active {
+  border-color: rgba(255, 220, 160, 0.9);
+  background: rgba(255, 220, 160, 0.12);
+  box-shadow: 0 0 12px rgba(255, 220, 160, 0.4);
 }
 
-.button-secondary:hover {
-  border-color: #9ca3af;
+/* ---------------------------------------------------- */
+/*                GRID RESPONSIVE LAYOUT                */
+/* ---------------------------------------------------- */
+
+@media (max-width: 1000px) {
+  .app-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  #root {
+    padding: 0.75rem;
+  }
+  .app-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------------------------------------------------- */
+/*     (OPTIONAL) RPG VIGNETTE BACKGROUND ASSET FIX     */
+/* ---------------------------------------------------- */
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle, rgba(0,0,0,0) 30%, rgba(0,0,0,0.6) 100%);
+  pointer-events: none;
+  z-index: -1;
 }
