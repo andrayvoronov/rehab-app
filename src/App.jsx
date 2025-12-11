@@ -1,19 +1,131 @@
 import { useState, useEffect } from "react";
 import "./index.css";
+
 import wizardImg from "./assets/FF_wizard.png";
 import levelUpImg from "./assets/level-up.png";
 import rxhabBanner from "./assets/rxhabquest_banner.png";
 
+// ===== SPRITE IMPORTS (ensure these exist in src/sprites) =====
+// PALADIN (p)
+import p1_m from "./sprites/p1_m.png";
+import p1_f from "./sprites/p1_f.png";
+import p4_m from "./sprites/p4_m.png";
+import p4_f from "./sprites/p4_f.png";
+
+// MAGE (m)
+import m1_m from "./sprites/m1_m.png";
+import m1_f from "./sprites/m1_f.png";
+import m4_m from "./sprites/m4_m.png";
+import m4_f from "./sprites/m4_f.png";
+
+// ASSASSIN (a)
+import a1_m from "./sprites/a1_m.png";
+import a1_f from "./sprites/a1_f.png";
+import a4_m from "./sprites/a4_m.png";
+import a4_f from "./sprites/a4_f.png";
+
+// HUNTER (h)
+import h1_m from "./sprites/h1_m.png";
+import h1_f from "./sprites/h1_f.png";
+import h4_m from "./sprites/h4_m.png";
+import h4_f from "./sprites/h4_f.png";
+
 const XP_LEVEL_CAP = 99;
 
-// XP needed to go from this level → next level
+// Simple class defs for the selector
+const CLASS_DEFS = [
+  {
+    id: "paladin",
+    code: "p",
+    finalTitle: "Solaris Paladin",
+    tierOneTitle: "Village Squire",
+    blurb:
+      "Armoured protector who channels light, structure, and steady progression. Great for patients who like a clear path and solid guard rails.",
+  },
+  {
+    id: "mage",
+    code: "m",
+    finalTitle: "Astral Mage",
+    tierOneTitle: "Curious Scribe",
+    blurb:
+      "Curious tactician who likes understanding the ‘why’ behind rehab. Perfect for data-driven, reflective patients.",
+  },
+  {
+    id: "assassin",
+    code: "a",
+    finalTitle: "Shadow Assassin",
+    tierOneTitle: "Novice Scout",
+    blurb:
+      "Agile, stealthy operator who loves efficiency, speed, and tight, focused sessions. Ideal for busy, time-poor humans.",
+  },
+  {
+    id: "hunter",
+    code: "h",
+    finalTitle: "Druid Ranger",
+    tierOneTitle: "Forest Initiate",
+    blurb:
+      "Nature-linked mover who thrives on variety, outdoor work, and whole-body feeling. Great for active, exploratory types.",
+  },
+];
+
+// ===== HELPERS =====
+
 function getXpForLevel(level) {
   const base = 40;
   const perLevel = 2;
   return base + perLevel * level;
 }
 
-// --- PSEUDO LOGIN COMPONENT ---
+function formatLastLogin(isoString) {
+  if (!isoString) return "No logins yet";
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) return "Unknown";
+
+  const now = new Date();
+  const diffMs = now - date;
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffHours < 1) return "Within the last hour";
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return `${diffDays} days ago`;
+  return date.toLocaleDateString();
+}
+
+function getFinalSprite(classId, gender) {
+  const isMale = gender === "male";
+  switch (classId) {
+    case "paladin":
+      return isMale ? p4_m : p4_f;
+    case "mage":
+      return isMale ? m4_m : m4_f;
+    case "assassin":
+      return isMale ? a4_m : a4_f;
+    case "hunter":
+      return isMale ? h4_m : h4_f;
+    default:
+      return isMale ? p4_m : p4_f;
+  }
+}
+
+function getTierOneSprite(classId, gender) {
+  const isMale = gender === "male";
+  switch (classId) {
+    case "paladin":
+      return isMale ? p1_m : p1_f;
+    case "mage":
+      return isMale ? m1_m : m1_f;
+    case "assassin":
+      return isMale ? a1_m : a1_f;
+    case "hunter":
+      return isMale ? h1_m : h1_f;
+    default:
+      return isMale ? p1_m : p1_f;
+  }
+}
+
+// ===== PSEUDO LOGIN =====
 
 const ROLES = [
   { id: "practitioner", label: "Clinician" },
@@ -36,7 +148,12 @@ function PseudoLogin({ onLogin }) {
       createdAt: new Date().toISOString(),
     };
 
-    localStorage.setItem("rehabAppUser", JSON.stringify(profile));
+    try {
+      localStorage.setItem("rehabAppUser", JSON.stringify(profile));
+    } catch (err) {
+      console.error("Failed to persist pseudo user", err);
+    }
+
     onLogin(profile);
   };
 
@@ -54,7 +171,6 @@ function PseudoLogin({ onLogin }) {
         </p>
 
         <form className="login-form" onSubmit={handleSubmit}>
-          {/* Role toggle */}
           <div className="login-field">
             <label className="login-label">I&apos;m logging in as</label>
             <div className="role-toggle">
@@ -73,22 +189,18 @@ function PseudoLogin({ onLogin }) {
             </div>
           </div>
 
-          {/* Name */}
           <div className="login-field">
             <label className="login-label">Display name</label>
             <input
               className="login-input"
               placeholder={
-                role === "practitioner"
-                  ? "e.g. Dr Andray"
-                  : "e.g. RehabRanger27"
+                role === "practitioner" ? "e.g. Dr Andray" : "e.g. RehabRanger27"
               }
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
           </div>
 
-          {/* Optional clinic / code */}
           <div className="login-field">
             <label className="login-label">
               Clinic / invite code{" "}
@@ -119,7 +231,28 @@ function PseudoLogin({ onLogin }) {
   );
 }
 
-// --- EXISTING DATA + COMPONENTS ---
+// ===== TYPEWRITER =====
+
+function Typewriter({ text, speed = 25 }) {
+  const [displayed, setDisplayed] = useState("");
+
+  useEffect(() => {
+    let i = 0;
+    setDisplayed("");
+
+    const interval = setInterval(() => {
+      i += 1;
+      setDisplayed(text.slice(0, i));
+      if (i >= text.length) clearInterval(interval);
+    }, speed);
+
+    return () => clearInterval(interval);
+  }, [text, speed]);
+
+  return <p>{displayed}</p>;
+}
+
+// ===== PATIENT DATA (PRACTITIONER SIDE) =====
 
 const initialPatients = [
   {
@@ -145,6 +278,9 @@ const initialPatients = [
     ],
     xpLevel: 2,
     xpCurrent: 40,
+    lastLogin: "2025-12-09T08:30:00Z",
+    engagement: "active",
+    outcomeTrend: [52, 48, 44, 40],
   },
   {
     id: "p-2",
@@ -168,6 +304,9 @@ const initialPatients = [
     ],
     xpLevel: 3,
     xpCurrent: 30,
+    lastLogin: "2025-12-05T18:10:00Z",
+    engagement: "moderate",
+    outcomeTrend: [60, 60, 58, 58],
   },
   {
     id: "p-3",
@@ -192,35 +331,107 @@ const initialPatients = [
     ],
     xpLevel: 4,
     xpCurrent: 40,
+    lastLogin: "2025-11-28T07:45:00Z",
+    engagement: "risk",
+    outcomeTrend: [42, 46, 50, 54],
   },
 ];
 
-function Typewriter({ text, speed = 25 }) {
-  const [displayed, setDisplayed] = useState("");
+// ===== OUTCOME MINI CHART (PRACTITIONER) =====
 
-  useEffect(() => {
-    let i = 0;
-    setDisplayed("");
+function OutcomeMiniChart({ values }) {
+  if (!values || values.length === 0) return null;
 
-    const interval = setInterval(() => {
-      i += 1;
-      setDisplayed(text.slice(0, i));
-      if (i >= text.length) clearInterval(interval);
-    }, speed);
+  const max = Math.max(...values);
+  const min = Math.min(...values);
+  const range = max - min || 1;
 
-    return () => clearInterval(interval);
-  }, [text, speed]);
-
-  return <p>{displayed}</p>;
+  return (
+    <div className="om-chart">
+      {values.map((v, idx) => {
+        const normalised = (v - min) / range;
+        const height = 30 + normalised * 40; // 30–70px
+        return (
+          <div
+            key={idx}
+            className="om-bar"
+            style={{ height: `${height}px` }}
+          />
+        );
+      })}
+    </div>
+  );
 }
 
-// Tweaked to start from welcome, now that pseudo login handles the email bit
-function PatientFlow() {
-  const [step, setStep] = useState("welcome");
-  const [avatarArchetype, setAvatarArchetype] = useState("Runner");
-  const [avatarVibe, setAvatarVibe] = useState("Calm & steady");
-  const [avatarFocus, setAvatarFocus] = useState("Lower limb");
+// ===== PATIENT FLOW (PATIENT JOURNEY + PORTAL) =====
 
+function PatientFlow({ onSendMessage, user }) {
+  const [step, setStep] = useState("welcome");
+  const [nickname, setNickname] = useState("");
+  const [archetype, setArchetype] = useState("Runner");
+  const [gender, setGender] = useState("male");
+  const [focus, setFocus] = useState("lower limb");
+  const [classIndex, setClassIndex] = useState(0);
+  const [showClassBurst, setShowClassBurst] = useState(false);
+
+  const [showMessageModal, setShowMessageModal] = useState(false);
+  const [messageText, setMessageText] = useState("");
+  const [messageUrgency, setMessageUrgency] = useState("normal");
+  const [messageSentHint, setMessageSentHint] = useState("");
+
+  const selectedClass = CLASS_DEFS[classIndex] ?? CLASS_DEFS[0];
+  const classId = selectedClass.id;
+
+  const tierOneSprite = getTierOneSprite(classId, gender);
+  const finalSprite = getFinalSprite(classId, gender);
+
+  const resetCreator = () => {
+    setNickname("");
+    setArchetype("Runner");
+    setGender("male");
+    setFocus("lower limb");
+    setClassIndex(0);
+    setStep("welcome");
+    setMessageSentHint("");
+  };
+
+  const goPrevClass = () => {
+    setClassIndex((prev) =>
+      prev === 0 ? CLASS_DEFS.length - 1 : prev - 1,
+    );
+    setMessageSentHint("");
+  };
+
+  const goNextClass = () => {
+    setClassIndex((prev) =>
+      prev === CLASS_DEFS.length - 1 ? 0 : prev + 1,
+    );
+    setMessageSentHint("");
+  };
+
+  const handleConfirmClass = () => {
+    setShowClassBurst(true);
+    setTimeout(() => {
+      setShowClassBurst(false);
+      setStep("summary");
+    }, 650);
+  };
+
+  const handleSendMessage = () => {
+    if (!messageText.trim()) return;
+    if (onSendMessage) {
+      onSendMessage({
+        message: messageText.trim(),
+        urgency: messageUrgency,
+      });
+    }
+    setMessageText("");
+    setMessageUrgency("normal");
+    setShowMessageModal(false);
+    setMessageSentHint("Message sent to your clinician (demo only).");
+  };
+
+  // ===== STEP: WELCOME =====
   if (step === "welcome") {
     return (
       <main className="patient-main">
@@ -252,27 +463,78 @@ Ready to step into your story and build the most capable version of you?`}
             />
           </div>
 
-          <button
-            className="btn-primary full-width-btn"
-            onClick={() => setStep("character")}
-          >
-            Accept quest
-          </button>
+          <div className="creator-nav creator-nav-centre">
+            <button
+              className="btn-primary"
+              type="button"
+              onClick={() => setStep("nickname")}
+            >
+              Start character setup
+            </button>
+          </div>
         </section>
       </main>
     );
   }
 
-  if (step === "character") {
+  // ===== STEP: NICKNAME =====
+  if (step === "nickname") {
     return (
       <main className="patient-main">
         <section className="card">
           <div className="card-header">
-            <h2>Create your rehab character</h2>
+            <h2>Your nickname</h2>
           </div>
           <p className="card-helper">
-            None of this changes your clinical programme – it just gives your
-            journey a face and a feel that matches you.
+            This is how you&apos;ll see yourself in the app. Your clinician
+            doesn&apos;t need this – it&apos;s just for you.
+          </p>
+
+          <div className="form-grid">
+            <label className="form-field">
+              <span className="label">Nickname</span>
+              <input
+                className="input"
+                placeholder="e.g. Knee Knight, Shoulder Witch…"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+              />
+            </label>
+          </div>
+
+          <div className="creator-nav">
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={() => setStep("welcome")}
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={() => setStep("profile")}
+              disabled={!nickname.trim()}
+            >
+              Next
+            </button>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  // ===== STEP: PROFILE =====
+  if (step === "profile") {
+    return (
+      <main className="patient-main">
+        <section className="card">
+          <div className="card-header">
+            <h2>Build your base profile</h2>
+          </div>
+          <p className="card-helper">
+            This doesn&apos;t change your clinical plan – it just helps the app
+            feel more like you.
           </p>
 
           <div className="form-grid">
@@ -280,136 +542,615 @@ Ready to step into your story and build the most capable version of you?`}
               <span className="label">Archetype</span>
               <select
                 className="input"
-                value={avatarArchetype}
-                onChange={(e) => setAvatarArchetype(e.target.value)}
+                value={archetype}
+                onChange={(e) => setArchetype(e.target.value)}
               >
                 <option>Runner</option>
-                <option>Lifter</option>
+                <option>Crossfitter</option>
                 <option>Grappler</option>
+                <option>Lifter</option>
+                <option>Baller</option>
                 <option>Everyday Hero</option>
               </select>
             </label>
 
             <label className="form-field">
-              <span className="label">Vibe</span>
-              <select
-                className="input"
-                value={avatarVibe}
-                onChange={(e) => setAvatarVibe(e.target.value)}
-              >
-                <option>Calm & steady</option>
-                <option>Fiery & driven</option>
-                <option>Playful & curious</option>
-                <option>Quietly determined</option>
-              </select>
+              <span className="label">Gender</span>
+              <div className="toggle-row">
+                <button
+                  type="button"
+                  className={
+                    "toggle-pill" +
+                    (gender === "male" ? " toggle-pill--active" : "")
+                  }
+                  onClick={() => setGender("male")}
+                >
+                  Male
+                </button>
+                <button
+                  type="button"
+                  className={
+                    "toggle-pill" +
+                    (gender === "female" ? " toggle-pill--active" : "")
+                  }
+                  onClick={() => setGender("female")}
+                >
+                  Female
+                </button>
+              </div>
             </label>
 
             <label className="form-field">
               <span className="label">Main focus</span>
               <select
                 className="input"
-                value={avatarFocus}
-                onChange={(e) => setAvatarFocus(e.target.value)}
+                value={focus}
+                onChange={(e) => setFocus(e.target.value)}
               >
-                <option>Lower limb</option>
-                <option>Shoulder / upper limb</option>
-                <option>Spine & core</option>
-                <option>Whole body resilience</option>
+                <option value="upper limb">Upper limb</option>
+                <option value="lower limb">Lower limb</option>
+                <option value="lower back">Lower back</option>
+                <option value="hips">Hips</option>
+                <option value="neck">Neck</option>
+                <option value="middle back">Middle back</option>
               </select>
             </label>
           </div>
 
-          <div className="character-preview">
-            <div className="avatar-circle">
-              <span className="avatar-initial">
-                {avatarArchetype.charAt(0)}
-              </span>
-            </div>
-            <div className="character-text">
-              <p className="character-title">
-                {avatarArchetype} · {avatarVibe}
-              </p>
-              <p className="character-sub">Focus: {avatarFocus}</p>
-              <p className="hint-text">
-                Later this can sync with a visual avatar, gear, and cosmetic
-                unlocks as you progress.
-              </p>
-            </div>
+          <div className="creator-nav">
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={() => setStep("nickname")}
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={() => setStep("class")}
+            >
+              Next
+            </button>
           </div>
-
-          <button
-            className="btn-primary full-width-btn"
-            onClick={() => setStep("portal")}
-          >
-            Confirm character
-          </button>
         </section>
       </main>
     );
   }
 
-  // Patient portal preview
-  return (
-    <main className="patient-main">
-      <section className="card">
-        <div className="card-header">
-          <h2>Patient portal (preview)</h2>
-        </div>
-        <p className="card-helper">
-          This is a simple mock of what a real patient view could look like
-          once their character is created.
-        </p>
+  // ===== STEP: CLASS SELECTOR (ONE AT A TIME + ARROWS) =====
+  if (step === "class") {
+    return (
+      <main className="patient-main">
+        <section className="card">
+          <div className="card-header">
+            <h2>Choose your class</h2>
+          </div>
+          <p className="card-helper">
+            These are the final forms of each class. You&apos;ll start at tier 1
+            and grow into them as your body adapts.
+          </p>
 
-        <div className="character-preview portal-preview">
-          <div className="avatar-circle">
-            <span className="avatar-initial">
-              {avatarArchetype.charAt(0)}
-            </span>
+          <div className="class-single-wrapper">
+            <div
+              className={
+                "class-card class-card-active" +
+                (showClassBurst ? " class-card-burst" : "")
+              }
+            >
+              <div className="class-sprite-wrap">
+                <img
+                  src={finalSprite}
+                  alt={selectedClass.finalTitle}
+                  className="class-sprite"
+                />
+              </div>
+              <div className="class-text">
+                <p className="class-name">{selectedClass.finalTitle}</p>
+                <p className="class-subtitle">
+                  Tier 1: {selectedClass.tierOneTitle}
+                </p>
+                <p className="class-blurb">{selectedClass.blurb}</p>
+              </div>
+            </div>
+
+            <div className="class-pager">
+              <button
+                type="button"
+                className="pager-btn"
+                onClick={goPrevClass}
+              >
+                ◀
+              </button>
+              <span className="pager-status">
+                {classIndex + 1} / {CLASS_DEFS.length}
+              </span>
+              <button
+                type="button"
+                className="pager-btn"
+                onClick={goNextClass}
+              >
+                ▶
+              </button>
+            </div>
           </div>
-          <div className="character-text">
-            <p className="character-title">
-              {avatarArchetype} · {avatarVibe}
+
+          <div className="creator-nav">
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={() => setStep("profile")}
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={handleConfirmClass}
+            >
+              Confirm class
+            </button>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  // ===== STEP: SUMMARY (CONFIRM OR RESTART) =====
+  if (step === "summary") {
+    return (
+      <main className="patient-main">
+        <section className="card">
+          <div className="card-header">
+            <h2>Review your character</h2>
+          </div>
+          <p className="card-helper">
+            Check everything looks right before you confirm. You can restart if
+            you want to change your vibe.
+          </p>
+
+          <div className="character-panel">
+            <div className="class-sprite-wrap large">
+              <img
+                src={tierOneSprite}
+                alt={selectedClass.tierOneTitle}
+                className="class-sprite"
+              />
+            </div>
+            <div className="character-details">
+              <p className="character-nickname">
+                {nickname || "Your nickname here"}
+              </p>
+              <p className="character-line">
+                Archetype: <span>{archetype}</span>
+              </p>
+              <p className="character-line">
+                Class: <span>{selectedClass.tierOneTitle}</span>
+              </p>
+              <p className="character-line">
+                Focus: <span>{focus}</span>
+              </p>
+            </div>
+          </div>
+
+          <div className="hint-text">
+            This summary won&apos;t replace real clinical notes – it&apos;s just
+            how your story shows up in the app.
+          </div>
+
+          <div className="creator-nav">
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={resetCreator}
+            >
+              Restart character setup
+            </button>
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={() => setStep("portal")}
+            >
+              Continue
+            </button>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  // ===== STEP: PATIENT PORTAL (SIMILAR TO PRACTITIONER LAYOUT) =====
+  return (
+    <>
+      <main className="app-grid patient-portal-grid">
+        <section className="card patient-portal-side">
+          <div className="card-header">
+            <h2>Your character</h2>
+          </div>
+
+          {/* centred character on portal */}
+          <div className="character-panel column portal-center">
+            <div className="class-sprite-wrap large">
+              <img
+                src={tierOneSprite}
+                alt={selectedClass.tierOneTitle}
+                className="class-sprite"
+              />
+            </div>
+            <div className="character-details">
+              <p className="character-nickname">
+                {nickname || (user?.name || "You")}
+              </p>
+              <p className="character-line">
+                Class: <span>{selectedClass.tierOneTitle}</span>
+              </p>
+              <p className="character-line">
+                Archetype: <span>{archetype}</span>
+              </p>
+              <p className="character-line">
+                Focus: <span>{focus}</span>
+              </p>
+            </div>
+          </div>
+
+          <div className="xp-block">
+            <div className="xp-header">
+              <span className="xp-level">Level 1</span>
+              <span className="xp-numbers">0 / 40 XP</span>
+            </div>
+            <div className="xp-bar-wrapper">
+              <div className="xp-bar">
+                <div className="xp-bar-fill" style={{ width: "0%" }} />
+              </div>
+            </div>
+            <p className="xp-hint">
+              In the full build this bar will link to your actual quests and
+              programme.
             </p>
-            <p className="character-sub">Focus: {avatarFocus}</p>
           </div>
+
+          <div className="divider" />
+
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={() => setShowMessageModal(true)}
+          >
+            Send message to clinician
+          </button>
+
+          {messageSentHint && (
+            <p className="hint-text portal-hint">{messageSentHint}</p>
+          )}
+
+          <div className="divider" />
+
+          {/* Restart button REMOVED here on purpose */}
+        </section>
+
+        <section className="card patient-portal-main">
+          <div className="card-header">
+            <h2>Your rehab hub</h2>
+          </div>
+          <p className="card-helper">
+            This is a simple preview of how your character, XP, and quests could
+            show up in your real portal.
+          </p>
+
+          <div className="portal-section">
+            <h3 className="section-title">Today&apos;s focus</h3>
+            <p className="hint-text">
+              In the real version, you&apos;ll see your key exercises, any
+              outcome measures, and how they fit into your current stage.
+            </p>
+          </div>
+
+          <div className="divider" />
+
+          <div className="portal-section">
+            <h3 className="section-title">Quests (example)</h3>
+            <ul className="quest-list">
+              <li className="quest-item">
+                <span className="quest-checkbox" />
+                <span>Complete your main rehab block once today.</span>
+              </li>
+              <li className="quest-item">
+                <span className="quest-checkbox" />
+                <span>Notice how your body feels before and after.</span>
+              </li>
+              <li className="quest-item">
+                <span className="quest-checkbox" />
+                <span>Do one small thing that feels like a win.</span>
+              </li>
+            </ul>
+          </div>
+
+          <div className="divider" />
+
+          <p className="hint-text">
+            All of this is prototype only and not medical advice – in a live
+            build, it would sync directly with your clinician&apos;s programme.
+          </p>
+        </section>
+      </main>
+
+      {showMessageModal && (
+        <div
+          className="program-modal-backdrop"
+          onClick={() => setShowMessageModal(false)}
+        >
+          <div
+            className="program-modal card message-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="program-modal-header">
+              <div>
+                <h2>Message your clinician</h2>
+                <p className="program-modal-sub">
+                  This will appear in their Notifications panel (demo only).
+                </p>
+              </div>
+              <button
+                className="app-logout-button"
+                onClick={() => setShowMessageModal(false)}
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="form-grid">
+              <label className="form-field">
+                <span className="label">Urgency</span>
+                <select
+                  className="input"
+                  value={messageUrgency}
+                  onChange={(e) => setMessageUrgency(e.target.value)}
+                >
+                  <option value="low">Low</option>
+                  <option value="normal">Normal</option>
+                  <option value="high">High</option>
+                </select>
+              </label>
+
+              <label className="form-field">
+                <span className="label">Message</span>
+                <textarea
+                  className="input message-textarea"
+                  rows={4}
+                  value={messageText}
+                  onChange={(e) => setMessageText(e.target.value)}
+                  placeholder="e.g. My knee flared after yesterday's run..."
+                />
+              </label>
+            </div>
+
+            <div className="creator-nav">
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => setShowMessageModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={handleSendMessage}
+                disabled={!messageText.trim()}
+              >
+                Send message
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+// ===== PROGRAM MODAL (PRACTITIONER SIDE) =====
+
+function ProgramModal({ patient, onClose }) {
+  if (!patient) return null;
+
+  return (
+    <div className="program-modal-backdrop" onClick={onClose}>
+      <div
+        className="program-modal card"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="program-modal-header">
+          <div>
+            <h2>{patient.name}</h2>
+            <p className="program-modal-sub">
+              {patient.sport} · {patient.condition}
+            </p>
+          </div>
+          <button className="app-logout-button" onClick={onClose}>
+            Close
+          </button>
+        </div>
+
+        <div className="program-modal-tags">
+          <span className="stage-pill">{patient.stage}</span>
+          <span className="pill-soft">{patient.behaviourLevel}</span>
         </div>
 
         <div className="divider" />
 
-        <div className="portal-grid">
+        <div className="program-modal-grid">
           <div>
-            <p className="label">Today&apos;s main quest</p>
-            <p>Complete your foundation block and log how your body feels.</p>
-          </div>
-          <div>
-            <p className="label">This week</p>
+            <h3 className="section-title">Current daily / weekly quests</h3>
             <ul className="quest-list">
-              <li className="quest-item">
-                <span className="quest-checkbox" />
-                <span>3 × rehab sessions</span>
-              </li>
-              <li className="quest-item">
-                <span className="quest-checkbox" />
-                <span>1 × &quot;win&quot; activity that feels good</span>
-              </li>
-              <li className="quest-item">
-                <span className="quest-checkbox" />
-                <span>Log your pain and confidence once this week</span>
-              </li>
+              {patient.quests.map((q, idx) => (
+                <li key={idx} className="quest-item">
+                  <span className="quest-checkbox" />
+                  <span>{q}</span>
+                </li>
+              ))}
             </ul>
+          </div>
+
+          <div>
+            <h3 className="section-title">Plan adjustments</h3>
+            <p className="hint-text">
+              This is where you&apos;ll tweak load, add / remove quests, and
+              push updated plans to the patient. For now this is just a visual
+              placeholder.
+            </p>
+
+            <div className="program-adjust-placeholder">
+              <div className="program-adjust-row">
+                <span>Stage</span>
+                <span className="pill-soft">{patient.stage}</span>
+              </div>
+              <div className="program-adjust-row">
+                <span>Behaviour level</span>
+                <span className="pill-soft">{patient.behaviourLevel}</span>
+              </div>
+              <div className="program-adjust-row">
+                <span>Notes</span>
+                <span className="pill-soft">Add clinical notes UI here</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <p className="hint-text">
-          In the full build, this screen will pull your real programme, outcome
-          measures, and XP from the clinician dashboard.
+        <p className="program-modal-footer">
+          Changes here would eventually sync to the patient&apos;s app view and
+          XP system.
         </p>
-      </section>
-    </main>
+      </div>
+    </div>
   );
 }
 
-// --- MAIN APP ---
+// ===== NOTIFICATIONS (CLINICIAN SIDE) =====
+
+function NotificationsCard({ notifications, onOpen }) {
+  return (
+    <section className="card notifications-card">
+      <div className="card-header">
+        <h2>Notifications</h2>
+      </div>
+      {(!notifications || notifications.length === 0) && (
+        <p className="card-helper">No messages from patients yet.</p>
+      )}
+      {notifications && notifications.length > 0 && (
+        <div className="notifications-list">
+          {notifications.map((n) => (
+            <div
+              key={n.id}
+              className={
+                "notification-row" +
+                (n.status === "unread" ? " notification-unread" : "")
+              }
+            >
+              <div className="notification-main">
+                <p className="notification-from">{n.from}</p>
+                <p className="notification-meta">
+                  {new Date(n.createdAt).toLocaleString()} ·{" "}
+                  <span className={"urgency-tag urgency-" + n.urgency}>
+                    {n.urgency === "high"
+                      ? "High"
+                      : n.urgency === "low"
+                      ? "Low"
+                      : "Normal"}
+                  </span>
+                  {n.status === "replied" && (
+                    <span className="notification-status-tag">Replied</span>
+                  )}
+                </p>
+              </div>
+              <button
+                type="button"
+                className="btn-secondary btn-small"
+                onClick={() => onOpen(n.id)}
+              >
+                Open
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function NotificationModal({ notification, onClose, onReply }) {
+  const [replyText, setReplyText] = useState("");
+
+  if (!notification) return null;
+
+  const handleReply = () => {
+    onReply(notification.id, replyText.trim());
+    setReplyText("");
+  };
+
+  return (
+    <div className="program-modal-backdrop" onClick={onClose}>
+      <div
+        className="program-modal card notification-modal"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="program-modal-header">
+          <div>
+            <h2>Message from {notification.from}</h2>
+            <p className="program-modal-sub">
+              {new Date(notification.createdAt).toLocaleString()} ·{" "}
+              <span className={"urgency-tag urgency-" + notification.urgency}>
+                {notification.urgency === "high"
+                  ? "High urgency"
+                  : notification.urgency === "low"
+                  ? "Low urgency"
+                  : "Normal urgency"}
+              </span>
+            </p>
+          </div>
+          <button className="app-logout-button" onClick={onClose}>
+            Close
+          </button>
+        </div>
+
+        <div className="notification-body">
+          <p>{notification.message}</p>
+        </div>
+
+        <div className="divider" />
+
+        <div className="notification-reply">
+          <p className="label">Reply (stored locally – demo only)</p>
+          <textarea
+            className="input notification-textarea"
+            rows={4}
+            value={replyText}
+            onChange={(e) => setReplyText(e.target.value)}
+            placeholder="Type your reply here..."
+          />
+          <div className="creator-nav">
+            <button
+              type="button"
+              className="btn-secondary btn-small"
+              onClick={onClose}
+            >
+              Close
+            </button>
+            <button
+              type="button"
+              className="btn-primary btn-small"
+              onClick={handleReply}
+              disabled={!replyText.trim()}
+            >
+              Save reply
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ===== MAIN APP =====
 
 function App() {
   const [user, setUser] = useState(null);
@@ -422,7 +1163,11 @@ function App() {
   const [levelUpKey, setLevelUpKey] = useState(0);
   const [showLevelUpPopup, setShowLevelUpPopup] = useState(false);
 
-  // Hydrate pseudo user
+  const [showProgramModal, setShowProgramModal] = useState(false);
+
+  const [notifications, setNotifications] = useState([]);
+  const [openNotificationId, setOpenNotificationId] = useState(null);
+
   useEffect(() => {
     try {
       const raw = localStorage.getItem("rehabAppUser");
@@ -442,8 +1187,42 @@ function App() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("rehabAppUser");
+    try {
+      localStorage.removeItem("rehabAppUser");
+    } catch (err) {
+      console.error("Failed to clear stored user", err);
+    }
     setUser(null);
+  };
+
+  const handleSendMessageFromPatient = ({ message, urgency }) => {
+    if (!user) return;
+    const entry = {
+      id: `n-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      from: user.name || "Patient",
+      createdAt: new Date().toISOString(),
+      urgency: urgency || "normal",
+      message,
+      status: "unread",
+    };
+    setNotifications((prev) => [entry, ...prev]);
+  };
+
+  const handleOpenNotification = (id) => {
+    setNotifications((prev) =>
+      prev.map((n) =>
+        n.id === id ? { ...n, status: n.status === "unread" ? "read" : n.status } : n,
+      ),
+    );
+    setOpenNotificationId(id);
+  };
+
+  const handleReplyNotification = (id, replyText) => {
+    setNotifications((prev) =>
+      prev.map((n) =>
+        n.id === id ? { ...n, status: "replied", reply: replyText } : n,
+      ),
+    );
   };
 
   const selectedIndex = patientData.findIndex((p) => p.id === selectedId);
@@ -474,7 +1253,6 @@ function App() {
       let level = current.xpLevel;
       let needed = getXpForLevel(level);
 
-      // support multiple level-ups in one hit
       while (level < XP_LEVEL_CAP && xp >= needed) {
         xp -= needed;
         level += 1;
@@ -489,12 +1267,10 @@ function App() {
       current.xpCurrent = xp;
       updated[selectedIndex] = current;
 
-      // +25 XP floater every time
       setShowXpGain(true);
       setXpGainKey((k) => k + 1);
       setTimeout(() => setShowXpGain(false), 1200);
 
-      // LEVEL UP popup on every level increase
       if (level > prevLevel) {
         setLevelUpKey((k) => k + 1);
         setShowLevelUpPopup(true);
@@ -505,14 +1281,12 @@ function App() {
     });
   };
 
-// If no pseudo user yet → show login screen
-if (!user) {
-  return (
-    <div className="app-root-login">
-      <PseudoLogin onLogin={handleLogin} />
-    </div>
-  );
-}
+  if (!user) {
+    return <PseudoLogin onLogin={handleLogin} />;
+  }
+
+  const openNotification =
+    notifications.find((n) => n.id === openNotificationId) || null;
 
   return (
     <div className={"app-root" + (showLevelUpPopup ? " screen-shake" : "")}>
@@ -561,23 +1335,19 @@ if (!user) {
         </div>
       </header>
 
-      {/* LEVEL UP overlay using your pixel image */}
       {showLevelUpPopup && (
         <div key={levelUpKey} className="levelup-popup">
           <img src={levelUpImg} alt="Level up" className="levelup-img" />
         </div>
       )}
 
-      {/* CONFETTI BURST */}
       {showLevelUpPopup && (
         <div key={"confetti-" + levelUpKey} className="confetti">
           {Array.from({ length: 18 }).map((_, i) => {
             const angle = (i / 18) * Math.PI * 2;
             const distance = 120 + Math.random() * 40;
-
             const x = Math.cos(angle) * distance + "px";
             const y = Math.sin(angle) * distance + "px";
-
             const colours = [
               "#facc15",
               "#f87171",
@@ -585,7 +1355,6 @@ if (!user) {
               "#60a5fa",
               "#fb923c",
             ];
-
             return (
               <div
                 key={i}
@@ -601,196 +1370,288 @@ if (!user) {
         </div>
       )}
 
-      {mode === "patient" && <PatientFlow />}
+      {mode === "patient" && (
+        <PatientFlow
+          onSendMessage={handleSendMessageFromPatient}
+          user={user}
+        />
+      )}
 
       {mode === "practitioner" && selected && (
-        <main className="app-grid">
-          {/* Left: patients list */}
-          <section className="card patients-card">
-            <div className="card-header">
-              <h2>Patients</h2>
-              <button className="btn-primary">+ Add new patient</button>
-            </div>
+        <>
+          <NotificationsCard
+            notifications={notifications}
+            onOpen={handleOpenNotification}
+          />
 
-            <p className="card-helper">
-              Select a patient to view their current clinical stage, behaviour
-              level, and weekly quests.
-            </p>
+          <main className="app-grid">
+            <section className="card patients-card">
+              <div className="card-header">
+                <h2>Patients</h2>
+                <button className="btn-primary">+ Add new patient</button>
+              </div>
 
-            <div className="patient-list">
-              {patientData.map((p) => (
+              <p className="card-helper">
+                Select a patient to view their current clinical stage, behaviour
+                level, engagement, and XP.
+              </p>
+
+              <div className="patient-list">
+                {patientData.map((p) => (
+                  <button
+                    key={p.id}
+                    className={
+                      "patient-pill" +
+                      (p.id === selectedId ? " patient-pill-active" : "")
+                    }
+                    onClick={() => setSelectedId(p.id)}
+                  >
+                    <div className="patient-pill-main">
+                      <span className="patient-name">{p.name}</span>
+                      <span className="patient-condition">
+                        {p.condition}
+                      </span>
+                    </div>
+                    <span className="patient-stage-chip">{p.stage}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <section className="card main-card">
+              <div className="card-header">
+                <h2>Patient overview</h2>
+                <span className="pill-soft">ID: {selected.id}</span>
+              </div>
+
+              <div className="overview-grid">
+                <div>
+                  <p className="label">Name</p>
+                  <p>{selected.name}</p>
+                </div>
+                <div>
+                  <p className="label">Age</p>
+                  <p>{selected.age}</p>
+                </div>
+                <div>
+                  <p className="label">Sport / activity</p>
+                  <p>{selected.sport}</p>
+                </div>
+                <div>
+                  <p className="label">Primary condition</p>
+                  <p>{selected.condition}</p>
+                </div>
+                <div>
+                  <p className="label">Phase</p>
+                  <p>{selected.phase}</p>
+                </div>
+                <div>
+                  <p className="label">Severity</p>
+                  <p>{selected.severity}</p>
+                </div>
+              </div>
+
+              <div className="divider" />
+
+              <div className="notes-block">
+                <p className="label">Notes</p>
+                <p>{selected.notes}</p>
+              </div>
+
+              <div className="pill-row">
+                <span className="stage-pill">{selected.stage}</span>
+                <span className="pill-soft">
+                  Stages reflect actual body progress (not XP).
+                </span>
+              </div>
+
+              <p className="hint-text">{selected.stageNotes}</p>
+            </section>
+
+            <section className="card side-card">
+              <div className="card-header">
+                <h2>Patient snapshot</h2>
                 <button
-                  key={p.id}
-                  className={
-                    "patient-pill" +
-                    (p.id === selectedId ? " patient-pill-active" : "")
-                  }
-                  onClick={() => setSelectedId(p.id)}
+                  className="btn-secondary btn-small"
+                  type="button"
+                  onClick={() => setShowProgramModal(true)}
                 >
-                  <div className="patient-pill-main">
-                    <span className="patient-name">{p.name}</span>
-                    <span className="patient-condition">{p.condition}</span>
-                  </div>
-                  <span className="patient-stage-chip">{p.stage}</span>
+                  View full programme
                 </button>
-              ))}
-            </div>
-          </section>
-
-          {/* Middle: overview */}
-          <section className="card main-card">
-            <div className="card-header">
-              <h2>Patient overview</h2>
-              <span className="pill-soft">ID: {selected.id}</span>
-            </div>
-
-            <div className="overview-grid">
-              <div>
-                <p className="label">Name</p>
-                <p>{selected.name}</p>
-              </div>
-              <div>
-                <p className="label">Age</p>
-                <p>{selected.age}</p>
-              </div>
-              <div>
-                <p className="label">Sport / activity</p>
-                <p>{selected.sport}</p>
-              </div>
-              <div>
-                <p className="label">Primary condition</p>
-                <p>{selected.condition}</p>
-              </div>
-              <div>
-                <p className="label">Phase</p>
-                <p>{selected.phase}</p>
-              </div>
-              <div>
-                <p className="label">Severity</p>
-                <p>{selected.severity}</p>
-              </div>
-            </div>
-
-            <div className="divider" />
-
-            <div className="notes-block">
-              <p className="label">Notes</p>
-              <p>{selected.notes}</p>
-            </div>
-
-            <div className="pill-row">
-              <span className="stage-pill">{selected.stage}</span>
-              <span className="pill-soft">
-                Stages reflect actual body progress (not XP).
-              </span>
-            </div>
-
-            <p className="hint-text">{selected.stageNotes}</p>
-          </section>
-
-          {/* Right: XP + behaviour */}
-          <section className="card side-card">
-            <div className="card-header">
-              <h2>XP progression</h2>
-            </div>
-
-            <div className="xp-block">
-              <div className="xp-header">
-                <span
-                  key={levelUpKey}
-                  className={
-                    "xp-level" + (levelUpKey > 0 ? " xp-level-flash" : "")
-                  }
-                >
-                  Level {selected.xpLevel}
-                </span>
-                <span className="xp-numbers">
-                  {selected.xpLevel >= XP_LEVEL_CAP
-                    ? "MAX LEVEL"
-                    : `${selected.xpCurrent} / ${getXpForLevel(
-                        selected.xpLevel,
-                      )} XP`}
-                </span>
               </div>
 
-              <div className="xp-bar-wrapper">
-                <div
-                  key={levelUpKey}
-                  className={
-                    "xp-bar" + (levelUpKey > 0 ? " xp-bar-pulse" : "")
-                  }
-                >
-                  <div
-                    className="xp-bar-fill"
-                    style={{ width: xpPercent + "%" }}
-                  />
+              <div className="engagement-row">
+                <div>
+                  <p className="label">Last login</p>
+                  <p>{formatLastLogin(selected.lastLogin)}</p>
+                </div>
+                <div className="engagement-right">
+                  <span
+                    className={
+                      "engagement-chip engagement-" +
+                      (selected.engagement || "moderate")
+                    }
+                  >
+                    {selected.engagement === "active"
+                      ? "Active"
+                      : selected.engagement === "risk"
+                      ? "At risk"
+                      : "Moderate"}
+                  </span>
+
+                  {selected.engagement === "risk" && (
+                    <button
+                      type="button"
+                      className="nudge-button"
+                      onClick={() =>
+                        alert(
+                          `Nudge sent to ${selected.name} (pseudo – notifications later)`,
+                        )
+                      }
+                    >
+                      Nudge patient
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="om-block">
+                <div className="om-header">
+                  <p className="label">Outcome measure trend</p>
+                  {selected.outcomeTrend &&
+                    selected.outcomeTrend.length > 0 && (
+                      <span className="om-latest">
+                        Latest:{" "}
+                        {
+                          selected.outcomeTrend[
+                            selected.outcomeTrend.length - 1
+                          ]
+                        }{" "}
+                        pts
+                      </span>
+                    )}
                 </div>
 
-                {showXpGain && (
-                  <div key={xpGainKey} className="xp-gain-float">
-                    +25 XP
+                {selected.outcomeTrend &&
+                selected.outcomeTrend.length > 0 ? (
+                  <OutcomeMiniChart values={selected.outcomeTrend} />
+                ) : (
+                  <p className="hint-text">No outcome data logged yet.</p>
+                )}
+
+                <p className="hint-text">
+                  Example only · hook this into your real outcome measures
+                  later.
+                </p>
+              </div>
+
+              <div className="divider" />
+
+              <div className="xp-block">
+                <div className="xp-header">
+                  <span
+                    key={levelUpKey}
+                    className={
+                      "xp-level" +
+                      (levelUpKey > 0 ? " xp-level-flash" : "")
+                    }
+                  >
+                    Level {selected.xpLevel}
+                  </span>
+                  <span className="xp-numbers">
+                    {selected.xpLevel >= XP_LEVEL_CAP
+                      ? "MAX LEVEL"
+                      : `${selected.xpCurrent} / ${getXpForLevel(
+                          selected.xpLevel,
+                        )} XP`}
+                  </span>
+                </div>
+
+                <div className="xp-bar-wrapper">
+                  <div
+                    key={levelUpKey}
+                    className={
+                      "xp-bar" + (levelUpKey > 0 ? " xp-bar-pulse" : "")
+                    }
+                  >
+                    <div
+                      className="xp-bar-fill"
+                      style={{ width: xpPercent + "%" }}
+                    />
                   </div>
+
+                  {showXpGain && (
+                    <div key={xpGainKey} className="xp-gain-float">
+                      +25 XP
+                    </div>
+                  )}
+                </div>
+
+                <p className="xp-hint">
+                  XP comes from completing weekly quests, outcome measures, and
+                  streaks.
+                </p>
+
+                <button
+                  className="btn-primary xp-test-btn"
+                  onClick={addTestXP}
+                >
+                  +25 XP (Test)
+                </button>
+              </div>
+
+              <div className="divider" />
+
+              <div className="side-section-header">
+                <h3>Rehab level (behaviour)</h3>
+              </div>
+
+              <div className="behaviour-level">
+                <p className="behaviour-title">
+                  {selected.behaviourLevel}
+                </p>
+                <p className="behaviour-summary">
+                  {selected.behaviourSummary}
+                </p>
+              </div>
+
+              <div className="divider" />
+
+              <div className="stages-rail">
+                {["Foundation", "Strength", "Power", "Athlete"].map(
+                  (stage) => (
+                    <div
+                      key={stage}
+                      className={
+                        "stage-node" +
+                        (stage === selected.stage
+                          ? " stage-node-active"
+                          : "")
+                      }
+                    >
+                      <span>{stage}</span>
+                    </div>
+                  ),
                 )}
               </div>
+            </section>
+          </main>
+        </>
+      )}
 
-              <p className="xp-hint">
-                XP comes from completing weekly quests, outcome measures, and
-                streaks.
-              </p>
+      {showProgramModal && (
+        <ProgramModal
+          patient={selected}
+          onClose={() => setShowProgramModal(false)}
+        />
+      )}
 
-              <button className="btn-primary xp-test-btn" onClick={addTestXP}>
-                +25 XP (Test)
-              </button>
-            </div>
-
-            <div className="divider" />
-
-            <div className="side-section-header">
-              <h3>Rehab level (behaviour)</h3>
-            </div>
-
-            <div className="behaviour-level">
-              <p className="behaviour-title">{selected.behaviourLevel}</p>
-              <p className="behaviour-summary">
-                {selected.behaviourSummary}
-              </p>
-            </div>
-
-            <div className="divider" />
-
-            <div className="stages-rail">
-              {["Foundation", "Strength", "Power", "Athlete"].map((stage) => (
-                <div
-                  key={stage}
-                  className={
-                    "stage-node" +
-                    (stage === selected.stage ? " stage-node-active" : "")
-                  }
-                >
-                  <span>{stage}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="divider" />
-
-            <div>
-              <h3 className="section-title">Weekly quests</h3>
-              <ul className="quest-list">
-                {selected.quests.map((q, idx) => (
-                  <li key={idx} className="quest-item">
-                    <span className="quest-checkbox" />
-                    <span>{q}</span>
-                  </li>
-                ))}
-              </ul>
-              <p className="hint-text">
-                Later this can sync with your real outcome measures and
-                auto-award XP.
-              </p>
-            </div>
-          </section>
-        </main>
+      {openNotification && (
+        <NotificationModal
+          notification={openNotification}
+          onClose={() => setOpenNotificationId(null)}
+          onReply={handleReplyNotification}
+        />
       )}
     </div>
   );
